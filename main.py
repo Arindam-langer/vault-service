@@ -1,30 +1,32 @@
-from fastapi import FastAPI,Depends
+from fastapi import FastAPI, Depends
+from contextlib import asynccontextmanager
 from models import PII_data
-from encrypt import encrypt_data,decrypt_data
+from encrypt import encrypt_data, decrypt_data
 from db.database import create_db_and_tables
 from db.database import get_session
-from db.crud import create_token,Session,get_token
+from db.crud import create_token, Session, get_token
 from db.models import Token
 
-app = FastAPI()
 
-@app.on_event("startup")
-def startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     create_db_and_tables()
+    yield
 
 
+app = FastAPI(lifespan=lifespan)
 
 
 # Health Check
 @app.get("/health")
 async def root():
-    return {"status": "all good"}  # this considered is json
+    return {"status": "all good"}
 
 
 # Get PII data
 @app.get("/vault/{token_id}")
-async def read_token(token_id: str,session: Session = Depends(get_session)):
-    db_data = get_token(session=session,token_id=token_id)
+async def read_token(token_id: str, session: Session = Depends(get_session)):
+    db_data = get_token(session=session, token_id=token_id)
     # fetch was successful
     token = Token(
         token_id=db_data.token_id,
@@ -51,5 +53,5 @@ async def add_token(pii_data: PII_data, session: Session = Depends(get_session))
         key_version=token.key_version,
         encrypted_dek=token.encrypted_dek,
     )
-    create_token(session=session,data=data)
+    create_token(session=session, data=data)
     return {"tokenId": token_id}
