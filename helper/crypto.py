@@ -33,9 +33,6 @@ def encrypt_data(data: PII_data):
         encrypted_dek=base64.b64encode(encrypted_dek).decode("ascii"),
         key_version=key_ver,
     )
-    print(encrypted_data)
-    # store the encrypted data in db
-    # return just success or error or a token id here
     return encrypted_data, token_id
 
 
