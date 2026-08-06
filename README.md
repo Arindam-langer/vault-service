@@ -19,4 +19,11 @@ for request body in fast api
 https://fastapi.tiangolo.com/tutorial/body/#declare-it-as-a-parameter
 
 
-well made the encryption and decryption functions they are working correctly now i am going to make 
+well made the encryption and decryption functions they are working correctly now i am going to make now i am going to make it connect to db and we will go from there i guess
+now how do you connect db in fastapi
+well completed it, turns out it is very easy.
+now we can fetch the decrypted token and add the pii data safely.
+
+now i need to look at any refactors and ways to make a migration to postgres
+#### TODO
+add a migration to postgres.
