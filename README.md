@@ -26,13 +26,15 @@ now we can fetch the decrypted token and add the pii data safely.
 
 now i need to look at any refactors and ways to make a migration to postgres when i complete it
 i am reading the code and i see that token class and Encrypted_data are very similar to each other just a difference of a token Id is there i think we can make it one only
-
+i just did the greatest thing when i made update token!! function during the task of token revokation flow, i am the greatest dev to think it on the fly. thanks go lang patterns
 **According to ai this is what i should implement now that i have completed basic stuff**
 #### TODO 
 - [x] **Fix Data Types & Schema Validation**:
 - [x] **Proper HTTP Error Responses**:
-- [ ] **Token Revocation Endpoint (`DELETE /vault/{token_id}`)**:
-  - *Reasoning*: Regulatory compliance (GDPR Right-to-be-forgotten / CCPA) requires services to revoke and hard-delete or mark tokens invalid upon request.
+- [x] **Token Revocation Endpoint (`DELETE /vault/{token_id}`)**:
+  - *Reasoning*: Regulatory compliance (GDPR Right-to-be-forgotten / CCPA) requires services to revoke and hard-delete or mark tokens invalid upon request. 
+    - TODO: make a cronjob to delete every token where revoked == true.
+  - *How to solve this*: To solve this we just add a bool flag to revoke that token then make a cron job that clears the db of revoke=true tokens.
 - [ ] **Support Dynamic PII Schemas**:
   - *Reasoning*: Hardcoding specific PII fields (`name`, `email`, `phone_no`, `ssn`) limits the vault's utility. A production vault accepts any JSON payload (`Dict[str, Any]`), encrypting whatever PII structure caller microservices send.
 - [ ] **PostgreSQL Containerization & Migration**:

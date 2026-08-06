@@ -6,7 +6,7 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.keywrap import aes_key_wrap
 from cryptography.hazmat.primitives.keywrap import aes_key_unwrap
 from db.models import Token
-from models import PII_data
+from models.models import PII_data
 from dotenv import load_dotenv
 
 # env variables
