@@ -1,12 +1,11 @@
-from pydantic import BaseModel, EmailStr, Field
 from enum import Enum
+from typing import Any
+
+from pydantic import RootModel
 
 
-class PII_data(BaseModel):
-    name: str
-    email: EmailStr
-    phone_no: str = Field(pattern=r"^\d{10}$")
-    ssn: str = Field(pattern=r"^\d{9}$")
+class PII_data(RootModel[dict[str, Any]]):
+    pass
 
 
 class TokenColumn(str, Enum):
