@@ -17,3 +17,6 @@ refer to https://fastapi.tiangolo.com/tutorial/path-params/#create-an-enum-class
 
 for request body in fast api
 https://fastapi.tiangolo.com/tutorial/body/#declare-it-as-a-parameter
+
+
+well made the encryption and decryption functions they are working correctly now i am going to make 
