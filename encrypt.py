@@ -5,7 +5,8 @@ import json
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.keywrap import aes_key_wrap
 from cryptography.hazmat.primitives.keywrap import aes_key_unwrap
-from models import PII_data, Encrypted_data
+from db.models import Token
+from models import PII_data
 from dotenv import load_dotenv
 
 # env variables
@@ -24,11 +25,12 @@ def encrypt_data(data: PII_data):
     ciphertext = encrypted[:-16]
     auth_tag = encrypted[-16:]
     encrypted_dek = aes_key_wrap(master_key, dek)
-    encrypted_data = Encrypted_data(
+    encrypted_data = Token(
+        token_id=token_id,
         ciphertext=base64.b64encode(ciphertext).decode("ascii"),
         auth_tag=base64.b64encode(auth_tag).decode("ascii"),
         iv=base64.b64encode(iv).decode("ascii"),
-        dek=base64.b64encode(encrypted_dek).decode("ascii"),
+        encrypted_dek=base64.b64encode(encrypted_dek).decode("ascii"),
         key_version=key_ver,
     )
     print(encrypted_data)
@@ -43,11 +45,11 @@ def create_token_id():
     return token_id
 
 
-def decrypt_data(token: Encrypted_data):
+def decrypt_data(token: Token):
     ciphertext = base64.b64decode(token.ciphertext)
     auth_tag = base64.b64decode(token.auth_tag)
     iv = base64.b64decode(token.iv)
-    encrypted_dek = base64.b64decode(token.dek)
+    encrypted_dek = base64.b64decode(token.encrypted_dek)
     dek = aes_key_unwrap(master_key, encrypted_dek)
     encrypted = ciphertext + auth_tag
     aesgcm = AESGCM(dek)

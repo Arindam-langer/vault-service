@@ -24,6 +24,7 @@ now how do you connect db in fastapi
 well completed it, turns out it is very easy.
 now we can fetch the decrypted token and add the pii data safely.
 
-now i need to look at any refactors and ways to make a migration to postgres
+now i need to look at any refactors and ways to make a migration to postgres when i complete it
+i am reading the code and i see that token class and Encrypted_data are very similar to each other just a difference of a token Id is there i think we can make it one only
 #### TODO
 add a migration to postgres.
