@@ -26,5 +26,27 @@ now we can fetch the decrypted token and add the pii data safely.
 
 now i need to look at any refactors and ways to make a migration to postgres when i complete it
 i am reading the code and i see that token class and Encrypted_data are very similar to each other just a difference of a token Id is there i think we can make it one only
-#### TODO
-add a migration to postgres.
+i just did the greatest thing when i made update token!! function during the task of token revokation flow, i am the greatest dev to think it on the fly. thanks go lang patterns
+**Token Revocation Endpoint**:
+  - *Reasoning*: Regulatory compliance (GDPR Right-to-be-forgotten / CCPA) requires services to revoke and hard-delete or mark tokens invalid upon request. 
+    - TODO: make a cronjob to delete every token where revoked == true.
+  - *How to solve this*: To solve this we just add a bool flag to revoke that token then make a cron job that clears the db of revoke=true tokens.
+**According to ai this is what i should implement now that i have completed basic stuff**
+#### TODO 
+- [x] **Support Dynamic PII Schemas**:
+  - *Reasoning*: Hardcoding specific PII fields (`name`, `email`, `phone_no`, `ssn`) limits the vault's utility. A production vault accepts any JSON payload (`Dict[str, Any]`), encrypting whatever PII structure caller microservices send.
+  - *How to solve this*: just make the pydantic model just validate if its json or not and done. thank you abstraction. you helped me.
+- [ ] **PostgreSQL Containerization & Migration**:
+  - *Reasoning*: SQLite is single-file and lock-bound, unsuitable for high-throughput distributed microservices. Update `DATABASE_URL` to PostgreSQL and add DB connection pooling.
+- [ ] **Redis Read Caching**:
+  - *Reasoning*: Vault read operations (`GET /vault/{token_id}`) dominate write operations in real-world microservices. Caching decrypted/encrypted entries in Redis dramatically reduces database IOPS.
+- [ ] **Docker Compose Setup**:
+  - *Reasoning*: Provide a unified `docker-compose.yml` spinning up FastAPI, PostgreSQL, and Redis with healthchecks and automatic migrations.
+- [ ] **Master Key Rotation Engine (`POST /admin/rotate-key`)**:
+  - *Reasoning*: AES-256-GCM envelope encryption allows rotating the Master Key by only re-wrapping the `encrypted_dek` column using `aes_key_wrap(new_master_key, unwrapped_dek)`—without touching or re-encrypting the payload ciphertext!
+- [ ] **Key Version Tracking**:
+  - *Reasoning*: Multi-version key support allows decrypting legacy tokens with older master keys while re-encrypting DEKs during background key migration.
+- [ ] **Batch Tokenization & Detokenization (`POST /vault/batch`)**:
+  - *Reasoning*: Prevents N+1 HTTP calls when microservices handle bulk data pipelines.
+- [ ] **Go Language Port & Performance Comparison**:
+  - *Reasoning*: As outlined in `vault design.md`, rewrite core endpoints in Go (using `crypto/cipher` AES-GCM and `pgx`) and benchmark Python FastAPI vs. Go using `k6` or `wrk` under high concurrency.

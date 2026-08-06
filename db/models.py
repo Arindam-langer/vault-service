@@ -1,5 +1,6 @@
 from sqlmodel import SQLModel, Field
 
+
 class Token(SQLModel, table=True):
     token_id: str = Field(primary_key=True, index=True)
     ciphertext: str
@@ -7,3 +8,4 @@ class Token(SQLModel, table=True):
     iv: str
     auth_tag: str
     key_version: str
+    revoked: bool = Field(default=False)
