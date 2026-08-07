@@ -15,3 +15,9 @@ class TokenColumn(str, Enum):
     AUTH_TAG = "auth_tag"
     KEY_VERSION = "key_version"
     REVOKED = "revoked"
+
+
+class KeyStatus(str, Enum):
+    ACTIVE = "active"
+    MIGRATE = "migrate"
+    RETIRED = "retired"

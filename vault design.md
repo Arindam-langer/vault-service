@@ -154,13 +154,23 @@ for example we get a json like this:
 }
 ``
 now how is it storing in the cipher text that is the biggest question which we get is how is the data we get 
+i have added dynamic pii handling so we are gucci.
 
-## Main_DB
-we know about what the PII db does what does the rest of the code does because i need it to show something which should be cooler than the PII i am implementing any suggestions
-----
+##### thinking of token revocation system
+now the main question is how are we going to deal with master token changing.
+so i have a shit ton of anxiety about this but this is so fucking cool,
+okay so we have right now we are storing the master key and key ver in the env, but to make the master token dynamic we can just do this where we add new version in env and go as we do, but that is very inefficient and redundant and requires alot of human touching
 
-### Main_DB Schema
-user_id:
-country:
-user_status:
-token_ID: stores the tokenId recieved from the PII_DB
+well Arindam we just make a migration script you know which we run when we need to rotate the script, well gee, that is a great idea but what about the running traffic do we down the db, no we just make a new db and encrypt DEK(Data encryption key ) with new master key in the new db and complete until it is done but it is also very human interventiony, because the scope of this service has changed now, it is not single client(me), yeah i am changing to make it handle multiple clients and it is the users that rotate there master keys, which creates more questions on how to handle different client which we do after making this because generate token is constantly same working the part to onboard clients we need to go **multi tenant** but that is also different in thinking.
+
+now **my solution** we store key in a key management system as KMS in which we store the master keys for every client.
+
+now the thinking is api trigger of rotate causes the master token switch in KMS and start the migration, this will be for the case that client is already onboarded i dont wanna think of onboarding for now because that shit comes in **multi tenant** so now we store the master token in a kms but i dont know what is a kms just that it is a db that is storing the keys for each client. now for now we will store it in another table and then shift according to the mood,
+the schema for a kms is
+
+``` 
+tenant_id
+master key(encrypted)
+key version
+status
+```

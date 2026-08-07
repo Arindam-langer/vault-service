@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from db.database import create_db_and_tables
-from routers import routers
+from routers import admin_route, token_route
 import logging
 
 logging.basicConfig(
@@ -23,4 +23,5 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.include_router(routers.router)
+app.include_router(token_route.router)
+app.include_router(admin_route.router)
