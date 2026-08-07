@@ -27,10 +27,15 @@ now we can fetch the decrypted token and add the pii data safely.
 now i need to look at any refactors and ways to make a migration to postgres when i complete it
 i am reading the code and i see that token class and Encrypted_data are very similar to each other just a difference of a token Id is there i think we can make it one only
 i just did the greatest thing when i made update token!! function during the task of token revokation flow, i am the greatest dev to think it on the fly. thanks go lang patterns
+
+- i am so **cracked** that for even development i am using openssl to create passwords
+command: ``openssl rand -hex 16``
 **Token Revocation Endpoint**:
   - *Reasoning*: Regulatory compliance (GDPR Right-to-be-forgotten / CCPA) requires services to revoke and hard-delete or mark tokens invalid upon request. 
     - TODO: make a cronjob to delete every token where revoked == true.
   - *How to solve this*: To solve this we just add a bool flag to revoke that token then make a cron job that clears the db of revoke=true tokens.
+
+Database schema and data migrations from sqlite to post gres using alembic which is a industry standard but you need to make the changes apparently and make data migrations. a to do one more is going to run data migrations when i change the schema after this is completed 
 **According to ai this is what i should implement now that i have completed basic stuff**
 #### TODO 
 - [x] **Support Dynamic PII Schemas**:
