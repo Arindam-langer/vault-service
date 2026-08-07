@@ -40,6 +40,7 @@ command: ``openssl rand -hex 16``
 so it is supposed to be a huge migration, i guess we are just changing the key version that encrypts dek, it should happen on an api call but since we can consider it a migration what we can do is make new migration table that does the copy of data and store it there, and then we clear that database.
 we can go eventual consistency route where from the secrets use the master key accordingly  and get according to that until token revoked making it dynamic and change it in post with different key version.
 so we get master key according to version and post according to new token. 
+as i am building master key rotation i am finding out why is okta and skyflow are working because they have multiple customer making each master key different for them and do we make one db for all or they go multi tenant i dont know,
 
 Database schema and data migrations from sqlite to post gres using alembic which is a industry standard but you need to make the changes apparently and make data migrations. a to do one more is going to run data migrations when i change the schema after this is completed 
 **According to ai this is what i should implement now that i have completed basic stuff**
