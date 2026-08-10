@@ -172,5 +172,33 @@ the schema for a kms is
 tenant_id
 master key(encrypted)
 key version
-status
+status: active | retiring | retired
+rotationTriggered by: 
+created date
+retired date
 ```
+
+found this : [KEY ENCRYPTION KEY (KEK) ROTATION FOR MULTI-TENANT (MT) SYSTEM](https://patents.justia.com/patent/20190173674)
+
+so what i think can solve master key rotation flow, two guys are at play
+  1. the key management system that stores client's keys
+  2. how we do the changing of master key.
+
+how we do the changing of master key?
+this is a nice question but i have found a nice answer for this, let's explain it with an example:
+for example we have company_A that has 1 million records in our vault that have a DEK encrypted with master key version: v1.0. So, its all good now like it is stored in our very secure KMS with the above schema !! so now a super user with admin role and access level token does the master token rotate now.
+what happens?? first we update the old token version status to retiring. we generate a new master token and update the key version and append it to the record with the tenent id of that client and update the rest of the records, now we have a new key and a retiring key, and we return 200 that master key rotated, we can provide the master key but what is the client gonna do with it, nothing i guess so we just tell him which key version is now there master key is on.
+
+now what happens after that api call to change the master token: a background job starts that runs for that tenent and starts to updates the DEKs, but we dont lock the db i have to study if the following thing will lock the db in case the record that is about to be updated is get at the same time or any other issue is caused like that or not.
+now if the client sends a request to create a new token we are going to fetch the latest version and use that and encrypt the dek and move.
+what about we get that token which uses old key version for dek, simple we just put a check that if the old key is used we update the decrypt the dek using the old key by fetching it from the kms with the keyversion stored in with that record and get the pii data then if that key is updating or in retiring state we just encrypt dek with the latest key version and update the record  and change the key version in the vault  db. and move on
+
+the background still working and updating and when it ends we just update the status of "retiring" to "retired" and stop.
+
+now what else can be the issue in the feature: 
+what happens when two calls happen 
+
+#### to do:
+- i need to work on authn and authz
+- audit logs on who revoked the token and who started token revocation 
+i also need to find out what roles and policies each route needs.
