@@ -174,3 +174,121 @@ master key(encrypted)
 key version
 status
 ```
+
+
+## latest Design changes:
+**The goal:** now since it is working in single form i want multiple client support.
+right now the master token is stored in the env when using the stuff so there is no way to make it dynamic now i have a solution, i have forgotten what i was thinking above and i would not read it since i have finalized the design, its gonna use permission based Authz and many more things to simplyfy it for me.
+
+
+### what i currently have
+i have just three end points create,get and delete with no AuthN and AuthZ.
+
+
+### The Design:
+first of all we have the:
+  PII token crud
+
+we are going to add the endpoints for:
+  - rotate token
+  - revoke token
+  - read the logs of the master token generation for the kms.
+  - simple token crud api logs.
+  - client account create.
+  - client account delete.
+  - client account create api and set permission to the api keys.
+  - we need a endpoint to manage the api keys just like the one for kms.
+
+lets expand the above endpoints in more verbose and organized format:
+1. master token endpoints
+  - rotate master tokens.
+  - revoke master tokens.
+
+2. logging endpoints for kms and token operations:
+  - log endpoint for kms. (with main identifier based on the apikey)
+  - log endpoint for token crud.(with main identifier based on the apikey)
+
+
+3. These endpoint are needed but not high priority under account handling for mostly api key management:
+  - SignUP Endpoint.
+  - SignIn Endpoint.
+  - LogOut Endpoint.
+  - Delete Account EndPoint.
+
+4. API key endpoints:
+  - Add API key. (permissions are a must if not permission then a base permission api key is given for that with just the token crud permissions.)
+  - Delete API key.
+  - rotate API key.
+  - Update permissions to an API key.
+
+
+So, we are going with permission based endpoints making it easier for endpoint management.
+now the main questions is what would contain the permission and what would be the authz middleware that handles the permissions to endpoint half for the vault.
+I have head of casbin but casbin but casbin is very granular and policy based so i wont be using that for now i will make my simple own permission based middleware i mean its just a check.
+
+Assuming i will use **API KEY** or **JWT Token** so i have permissions inside the claims and now we just have a basic function to just compare claims with the permission on the endpoint, just that nothing else.
+-------
+
+### Now how to make it possible:
+how do i break it into more steps.
+
+in high level we have the following:
+- endpoint making
+- making the kms.
+- db designs
+- middleware for permission check.
+
+
+#### Endpoints
+1. master token endpoints
+  - rotate master tokens.
+  - revoke master tokens.
+
+2. logging endpoints for kms and token operations:
+  - log endpoint for kms. (with main identifier based on the apikey)
+  - log endpoint for token crud.(with main identifier based on the apikey)
+
+
+3. These endpoint are needed but not high priority under account handling for mostly api key management:
+  - SignUP Endpoint.
+  - SignIn Endpoint.
+  - LogOut Endpoint.
+  - Delete Account EndPoint.
+
+4. API key endpoints:
+  - Add API key. (permissions are a must if not permission then a base permission api key is given for that with just the token crud permissions.)
+  - Delete API key.
+  - rotate API key.
+  - Update permissions to an API key.
+
+
+#### KMS
+the place basically is a whole different ass db which stores just every key, in the basic sense it will only have one table and we need seperate utility functions to access it.
+
+The schema of the KMS table schema.
+relation: one account many master tokens.
+- Account_id
+- Created_at
+- Updated_at
+- API_key - encrypted or whatever is simple and best to store in db since we cannot store it raw and identifier telling who revoked it or rotated it for the logs i guess.
+- Key version: 1 || 2 ....
+- status: Active | revoked | Rotating.
+
+#### db designs
+how many DBs and tables do we need.
+we have four things I think in play:
+- Account information
+- KMS
+- API key
+- PII tokens
+
+so we will for now just use 2 DBs:
+1. KMS
+2. Vault- with following tables
+  - Account information
+  - KMS
+  - API key
+  - PII tokens
+
+### middleware for permission check.
+for this we are going to assume that we will have a API Key with permissions we are going to just check the API key in the db and get the permission set  go for the middle ware from there.

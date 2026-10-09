@@ -9,12 +9,7 @@ from services.token_service import (
 )
 
 # add prefix and tags in app router when making key version rotation
-router = APIRouter()
-
-
-@router.get("/healthz", status_code=status.HTTP_200_OK)
-def health_check():
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+router = APIRouter(prefix="/token", tags=["TOKEN"])
 
 
 @router.post(
